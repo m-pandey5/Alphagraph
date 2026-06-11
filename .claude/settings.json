@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import langgraph; print\\('langgraph', langgraph.__version__\\)\")",
+      "Bash(python3 -c \"import yfinance; print\\('yfinance ok'\\)\")",
+      "Bash(python3 -c \"import faiss; print\\('faiss ok'\\)\")",
+      "Bash(python3 -c \"import streamlit; print\\('streamlit ok'\\)\")",
+      "Bash(.venv/bin/python -m pytest -v)"
+    ]
+  }
+}
