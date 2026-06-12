@@ -103,7 +103,29 @@ def render_margin_chart(profitability: dict, ticker: str):
 st.sidebar.title("AlphaGraph")
 st.sidebar.caption("Multi-Agent Financial Research System")
 st.sidebar.markdown("---")
-ticker_input = st.sidebar.text_input("Stock Ticker", value="AAPL", max_chars=10).upper().strip()
+_raw_ticker = st.sidebar.text_input(
+    "Stock Ticker",
+    value="AAPL",
+    max_chars=20,
+    placeholder="e.g. AAPL, AMZN, MSFT",
+    help="Enter a stock ticker symbol (not the company name).",
+).upper().strip()
+# Forgiving fallback: map common company names to their ticker symbols.
+NAME_TO_TICKER = {
+    "APPLE": "AAPL",
+    "AMAZON": "AMZN",
+    "GOOGLE": "GOOGL",
+    "ALPHABET": "GOOGL",
+    "MICROSOFT": "MSFT",
+    "TESLA": "TSLA",
+    "NVIDIA": "NVDA",
+    "META": "META",
+    "FACEBOOK": "META",
+    "NETFLIX": "NFLX",
+}
+ticker_input = NAME_TO_TICKER.get(_raw_ticker, _raw_ticker)
+if ticker_input != _raw_ticker:
+    st.sidebar.caption(f"Using ticker **{ticker_input}** for {_raw_ticker.title()}.")
 run_btn = st.sidebar.button("Analyze", type="primary", use_container_width=True)
 st.sidebar.markdown("---")
 st.sidebar.markdown("**How it works:**")
