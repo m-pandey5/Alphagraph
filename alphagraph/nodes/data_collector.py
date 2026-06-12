@@ -1,5 +1,20 @@
+import pandas as pd
 import yfinance as yf
 from alphagraph.state import FinancialState
+
+
+def _df_to_dict(df: pd.DataFrame | None) -> dict:
+    """Serialize a yfinance statement to a JSON-clean dict.
+
+    yfinance uses pandas Timestamp objects as column labels, which are not valid
+    JSON keys (breaks LangSmith tracing / any JSON serialization). Stringify the
+    date columns while preserving their order (most recent first).
+    """
+    if df is None or df.empty:
+        return {}
+    df = df.copy()
+    df.columns = [str(c) for c in df.columns]
+    return df.to_dict()
 
 
 def financial_data_collector(state: FinancialState) -> dict:
@@ -20,9 +35,9 @@ def financial_data_collector(state: FinancialState) -> dict:
         return {
             "ticker": ticker,
             "company_name": company_name,
-            "income_stmt": income_stmt.to_dict(),
-            "balance_sheet": balance_sheet.to_dict() if balance_sheet is not None else {},
-            "cash_flow": cash_flow.to_dict() if cash_flow is not None else {},
+            "income_stmt": _df_to_dict(income_stmt),
+            "balance_sheet": _df_to_dict(balance_sheet),
+            "cash_flow": _df_to_dict(cash_flow),
             "error": None,
         }
     except Exception as e:

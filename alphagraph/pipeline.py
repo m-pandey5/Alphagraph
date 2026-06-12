@@ -12,7 +12,19 @@ load_dotenv()
 
 from alphagraph.graph import build_graph  # noqa: E402  (must follow load_dotenv)
 
+# Optional LangSmith tracing. When LANGCHAIN_TRACING_V2=true and LANGCHAIN_API_KEY
+# are set, every run is traced to the LangSmith dashboard. The @traceable decorator
+# is a no-op when tracing is disabled, and degrades gracefully if langsmith is absent.
+try:
+    from langsmith import traceable
+except ImportError:  # pragma: no cover
+    def traceable(*args, **kwargs):
+        def _decorator(fn):
+            return fn
+        return _decorator(args[0]) if args and callable(args[0]) else _decorator
 
+
+@traceable(name="AlphaGraph Pipeline", run_type="chain")
 def run(ticker: str) -> dict:
     graph = build_graph()
     initial_state = {
